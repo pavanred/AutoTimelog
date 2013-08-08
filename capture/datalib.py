@@ -29,6 +29,26 @@ class Database(object):
                 return app
         return ''
 
+    def get_config_value(self, key):
+        self.cursor.execute("select value from config where key = ?",(key,))
+        row = self.cursor.fetchone()
+        if row:
+            value = row[0]
+        else:
+            value = 0        
+        return str(value)
+    
+    def record_activity(self,app):
+        self.cursor.execute("select duration from activity where appid = ?",(app.appid,))
+        row = self.cursor.fetchone()
+        if row:
+            duration = int(row[0]) + 1    
+            self.cursor.execute("update activity set duration = ? where appid = ?",(duration,app.appid,))        
+        else:
+            duration = 1
+            self.cursor.execute('insert into activity values (?,?)',(app.appid,duration,))
+        self.connection.commit()        
+
     def __init__(self):
         '''
         Constructor

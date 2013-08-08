@@ -8,14 +8,17 @@ from subprocess import Popen, PIPE
 import re, time
 import datalib, application
 
-def main():    
-    while True:
-        apps = datalib.Database().get_appliction_list()    
-        x = get_active_window_title(apps)
-        print str(x)
-        time.sleep(2)
-
-def get_active_window_title(apps):     
+def main():  
+    db = datalib.Database();
+    #capture_interval = int(db.get_config_value('capture_interval')) #in seconds    
+    
+    while True: 
+        active_app = get_active_window_title()
+        db.record_activity(active_app)        
+        time.sleep(2) #60 - captures every minute
+        #time.sleep(capture_interval)
+        
+def get_active_window_title():     
     root_check = ''
     root = Popen(['xprop', '-root'],  stdout=PIPE)
 
@@ -38,9 +41,10 @@ def get_active_window_title(apps):
                 mtype = match.group("type")
                 if mtype == "STRING" or mtype == "COMPOUND_TEXT":
                     db = datalib.Database()
+                    apps = db.get_appliction_list()    
                     app = db.app_exists(str(match.group("app")).replace("\"",""),apps)
                     if app != '':
-                        print 'return - ' + app.application
+                        #print 'return - ' + app.application
                         return app
                     else:
                         newapp = application.Application(match.group("app"),match.group("class"),'')                        
