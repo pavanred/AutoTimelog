@@ -12,6 +12,11 @@ class Activity(object):
 
     def __init__(self):
         '''
-        Constructor
+        constructor
         '''
+        self.application = ""
+        self.classfication = ""
+        self.duration = ""
+        self.capturetype = ""
+        #self
         
