@@ -38,15 +38,41 @@ class Database(object):
             value = 0        
         return str(value)
     
-    def record_activity(self,app):
-        self.cursor.execute("select duration from activity where appid = ?",(app.appid,))
+    def clear_session_data(self):
+        self.cursor.execute('delete from activity_session')
+        self.connection.commit()        
+    
+    def record_activity(self,appid):
+        self.cursor.execute("select hours, minutes from activity_session where appid = ?",(appid,))
         row = self.cursor.fetchone()
         if row:
-            duration = int(row[0]) + 1    
-            self.cursor.execute("update activity set duration = ? where appid = ?",(duration,app.appid,))        
+            hours = int(row[0])
+            minutes = int(row[1])
+            if minutes == 59:
+                hours = hours + 1
+                minutes = 0
+            self.cursor.execute("update activity_session set minutes = ?,hours =? where appid = ?",(minutes,hours,appid,))        
         else:
-            duration = 1
-            self.cursor.execute('insert into activity values (?,?)',(app.appid,duration,))
+            minutes = 1
+            self.cursor.execute('insert into activity_session values (?,?,?)',(appid,0,minutes,))
+        self.connection.commit()        
+        
+        self.cursor.execute("select days, hours, minutes from activity_lifetime where appid = ?",(appid,))
+        row = self.cursor.fetchone()
+        if row:
+            days = int(row[0])
+            hours = int(row[1])
+            minutes = int(row[2])
+            if hours == 23:
+                days = days + 1
+                hours = 0
+            if minutes == 59:
+                hours = hours + 1
+                minutes = 0            
+            self.cursor.execute("update activity_lifetime set minutes = ?,hours = ?, days = ? where appid = ?",(minutes,hours,days,appid,))        
+        else:
+            minutes = 1
+            self.cursor.execute('insert into activity_lifetime values (?,?,?,?)',(appid,0,0,minutes,))
         self.connection.commit()        
 
     def __init__(self):
