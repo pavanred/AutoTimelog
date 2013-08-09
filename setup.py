@@ -7,7 +7,7 @@ from pysqlite2 import dbapi2 as sqlite
 import os
 
 def main():
-    print '***Timelog setup***'
+    print '***AutoTimelog v0.1 setup***'
     
     try:
         if not os.path.exists('data'):

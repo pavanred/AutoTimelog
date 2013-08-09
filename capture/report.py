@@ -3,18 +3,35 @@ Created on Aug 8, 2013
 
 @author: pavan
 '''
-import datalib, application
+import datalib
 
 def main(reporttype):
-    if reporttype == 'session':
-        reportlist = get_session_list()
-    else:
-        reportlist = get_lifetime_list()
+    reportlist = get_session_list()
+    reportlist_life = get_lifetime_list()
     total = calculate_total(reportlist)
     reportlist = calculate_percentage(reportlist,total)
+    total = calculate_total(reportlist_life)
+    reportlist_life = calculate_percentage(reportlist_life,total)
     
-    for item in reportlist:
-        print item.name + ',' + str(item.days) + ',' + str(item.hours) + ',' + str(item.minutes) + ',' + str(item.percentage)
+    print 'AutoTimelog v0.1'   
+    print '' 
+     
+    if reporttype == 'lifetime':
+        print 'Life time'
+        display_report(reportlist_life)
+    elif(reporttype ==  'session'):
+        print 'Current session'
+        display_report(reportlist)
+    else:
+        print 'Current session'
+        display_report(reportlist)
+        print ''
+        print 'Life time'
+        display_report(reportlist_life)
+
+def display_report(reportlist):
+    for item in reportlist:        
+        print item.name + ' - ' + str("%.2f" %item.percentage) + '% ' + '(' + str(item.days) + ' days, ' + str(item.hours) + ' hours,' + str(item.minutes) + ' mins)'
 
 def calculate_total(reportlist):
     totaldays = 0.0
@@ -62,7 +79,7 @@ def get_lifetime_list():
     return reportlist
 
 if __name__ == '__main__':
-    main('session')
+    main('all')
         
 class Report(object):
         
