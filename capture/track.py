@@ -14,14 +14,15 @@ def main():
     clear_session_data()  
     logging.basicConfig()  
     sched = Scheduler(standalone=True)    
-    sched.add_interval_job(activity_tracking_job, seconds=1)
+    sched.add_interval_job(activity_tracking_job, minutes=1)
     sched.start()
     #capture_interval = int(db.get_config_value('capture_interval')) #in seconds 
 
 def activity_tracking_job():
     db = datalib.Database()
     active_app = get_active_window_title()
-    db.record_activity(active_app.appid)   
+    if active_app != '':
+        db.record_activity(active_app.appid)   
      
 def clear_session_data():
     db = datalib.Database()

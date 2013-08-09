@@ -4,7 +4,7 @@ Created on Aug 7, 2013
 @author: pavan
 '''
 from pysqlite2 import dbapi2 as sqlite
-import application
+import application, report
 
 class Database(object):
     '''
@@ -51,10 +51,10 @@ class Database(object):
             if minutes == 59:
                 hours = hours + 1
                 minutes = 0
-            self.cursor.execute("update activity_session set minutes = ?,hours =? where appid = ?",(minutes,hours,appid,))        
+            self.cursor.execute("update activity_session set minutes = ?,hours =? where appid = ?",(minutes,hours,appid))        
         else:
             minutes = 1
-            self.cursor.execute('insert into activity_session values (?,?,?)',(appid,0,minutes,))
+            self.cursor.execute('insert into activity_session values (?,?,?)',(appid,0,minutes))
         self.connection.commit()        
         
         self.cursor.execute("select days, hours, minutes from activity_lifetime where appid = ?",(appid,))
@@ -69,11 +69,27 @@ class Database(object):
             if minutes == 59:
                 hours = hours + 1
                 minutes = 0            
-            self.cursor.execute("update activity_lifetime set minutes = ?,hours = ?, days = ? where appid = ?",(minutes,hours,days,appid,))        
+            self.cursor.execute("update activity_lifetime set minutes = ?,hours = ?, days = ? where appid = ?",(minutes,hours,days,appid))        
         else:
             minutes = 1
-            self.cursor.execute('insert into activity_lifetime values (?,?,?,?)',(appid,0,0,minutes,))
-        self.connection.commit()        
+            self.cursor.execute('insert into activity_lifetime values (?,?,?,?)',(appid,0,0,minutes))
+        self.connection.commit()  
+        
+    def get_session_data(self):
+        self.cursor.execute("select name,hours,minutes from activity_session inner join application on appid = id")
+        reportlist = []
+        for row in self.cursor:
+            rpt = report.Report(row[0],0,row[1],row[2])
+            reportlist.append(rpt)
+        return reportlist   
+    
+    def get_lifetime_data(self):
+        self.cursor.execute("select name,days,hours,minutes from activity_lifetime inner join application on appid = id")
+        reportlist = []
+        for row in self.cursor:
+            rpt = report.Report(row[0],row[1],row[2],row[3])
+            reportlist.append(rpt)
+        return reportlist   
 
     def __init__(self):
         '''
