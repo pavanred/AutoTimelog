@@ -4,7 +4,7 @@ Created on Aug 7, 2013
 @author: pavan
 '''
 from pysqlite2 import dbapi2 as sqlite
-import application, report
+import application, report, os, sys
 
 class Database(object):
     '''
@@ -63,8 +63,8 @@ class Database(object):
                 minutes = int(row[1])
                 if minutes == 59:
                     hours = hours + 1
-                    minutes = 0
-                self.cursor.execute("update activity_session set minutes = ?,hours =? where appid = ?",(minutes,hours,appid))        
+                    minutes = -1
+                self.cursor.execute('update activity_session set minutes = ?,hours =? where appid = ?',(minutes+1,hours,appid))        
             else:
                 minutes = 1
                 self.cursor.execute('insert into activity_session values (?,?,?)',(appid,0,minutes))
@@ -76,13 +76,15 @@ class Database(object):
                 days = int(row[0])
                 hours = int(row[1])
                 minutes = int(row[2])
-                if hours == 23:
-                    days = days + 1
-                    hours = 0
                 if minutes == 59:
-                    hours = hours + 1
-                    minutes = 0            
-                self.cursor.execute("update activity_lifetime set minutes = ?,hours = ?, days = ? where appid = ?",(minutes,hours,days,appid))        
+                    if hours == 23:
+                        days = days + 1
+                        hours = 0
+                        minutes = -1
+                    else:
+                        hours = hours + 1
+                        minutes = -1                           
+                self.cursor.execute('update activity_lifetime set minutes = ?,hours = ?, days = ? where appid = ?',(minutes+1,hours,days,appid))        
             else:
                 minutes = 1
                 self.cursor.execute('insert into activity_lifetime values (?,?,?,?)',(appid,0,0,minutes))
@@ -117,7 +119,9 @@ class Database(object):
         Constructor
         '''
         try:
-            self.connection = sqlite.connect('../data/timelog.sqlite')
+            pathname = os.path.dirname(sys.argv[0])
+            fullpath = os.path.abspath(pathname)
+            self.connection = sqlite.connect(fullpath + '/../data/timelog.sqlite')
             self.cursor = self.connection.cursor()
         except:
             raise

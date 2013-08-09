@@ -4,17 +4,19 @@ Created on Aug 7, 2013
 @author: pavan
 '''
 from pysqlite2 import dbapi2 as sqlite
-import os
+import os, sys
 
 def main():
     print '***AutoTimelog v0.1 setup***'
     
     try:
-        if not os.path.exists('data'):
-            os.makedirs('data')
+        pathname = os.path.dirname(sys.argv[0])
+        fullpath = os.path.abspath(pathname)
+        if not os.path.exists(fullpath + '/data'):
+            os.makedirs(fullpath + '/data')
             
         print 'creating sqlite database...'
-        connection = sqlite.connect('data/timelog.sqlite')
+        connection = sqlite.connect(fullpath + '/data/timelog.sqlite')
         cursor = connection.cursor()
         
         print 'executing ddls'

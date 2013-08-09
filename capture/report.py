@@ -31,7 +31,7 @@ def main(reporttype):
 
 def display_report(reportlist):
     for item in reportlist:        
-        print item.name + ' - ' + str("%.2f" %item.percentage) + '% ' + '(' + str(item.days) + ' days, ' + str(item.hours) + ' hours,' + str(item.minutes) + ' mins)'
+        print item.name + ' - ' + str("%.2f" %item.percentage) + '% ' + '(' + str(item.days) + ' days, ' + str(item.hours) + ' hours, ' + str(item.minutes) + ' mins)'
 
 def calculate_total(reportlist):
     totaldays = 0.0
