@@ -30,7 +30,9 @@ def main(reporttype):
         display_report(reportlist_life)
 
 def display_report(reportlist):
-    for item in reportlist:        
+    
+    sortedlist = sorted(reportlist,key=lambda x:x.percentage, reverse=True)    
+    for item in sortedlist:        
         print item.name + ' - ' + str("%.2f" %item.percentage) + '% ' + '(' + str(item.days) + ' days, ' + str(item.hours) + ' hours, ' + str(item.minutes) + ' mins)'
 
 def calculate_total(reportlist):
